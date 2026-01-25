@@ -2,7 +2,7 @@
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
 
 permissions:
@@ -10,14 +10,27 @@ permissions:
 
 jobs:
   build-test:
-    runs-on: windows-latest
+    name: ${{ matrix.os }} / stable
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest, ubuntu-latest ]
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Install Rust (stable + components)
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
 
       - name: Format
         run: cargo fmt --check
@@ -28,19 +41,21 @@ jobs:
       - name: Tests
         run: cargo test
 
-      - name: Deterministic demo (hash stable between runs)
+      - name: Deterministic demo (trace hash stable between runs)
         shell: pwsh
         run: |
-          Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
-          cargo run -p agent_cli -- run-demo --in demo/inputs/config.txt --out out
-           = (Get-FileHash out/trace.json -Algorithm SHA256).Hash
+          $ErrorActionPreference = "Stop"
 
           Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
           cargo run -p agent_cli -- run-demo --in demo/inputs/config.txt --out out
-           = (Get-FileHash out/trace.json -Algorithm SHA256).Hash
+          $h1 = (Get-FileHash "out/trace.json" -Algorithm SHA256).Hash
 
-          if ( -ne ) {
-            Write-Error "Non-deterministic output detected:  vs "
+          Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
+          cargo run -p agent_cli -- run-demo --in demo/inputs/config.txt --out out
+          $h2 = (Get-FileHash "out/trace.json" -Algorithm SHA256).Hash
+
+          if ($h1 -ne $h2) {
+            Write-Error "Non-deterministic output detected: $h1 vs $h2"
             exit 1
           }
 
