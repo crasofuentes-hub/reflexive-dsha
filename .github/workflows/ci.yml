@@ -1,1 +1,17 @@
-﻿
+﻿      - name: Deterministic demo (trace hash stable between runs)
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
+          cargo run -p agent_cli -- run-demo --in demo/inputs/config.txt --out out
+          $h1 = (Get-FileHash "out/trace.json" -Algorithm SHA256).Hash
+
+          Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
+          cargo run -p agent_cli -- run-demo --in demo/inputs/config.txt --out out
+          $h2 = (Get-FileHash "out/trace.json" -Algorithm SHA256).Hash
+
+          if ($h1 -ne $h2) {
+            Write-Error "Non-deterministic output detected: $h1 vs $h2"
+            exit 1
+          }
+
+          cargo run -p agent_cli -- verify-trace --trace out/trace.json
