@@ -9,6 +9,19 @@ permissions:
   contents: read
 
 jobs:
+  lean-proofs:
+    name: ubuntu-latest / lean proofs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: proofs/lean
+      - name: Build proofs
+        run: |
+          cd proofs/lean
+          lake build
   build-test:
     name: ${{ matrix.os }} / stable
     runs-on: ${{ matrix.os }}
@@ -60,3 +73,4 @@ jobs:
           }
 
           cargo run -p agent_cli -- verify-trace --trace out/trace.json
+
