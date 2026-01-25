@@ -74,3 +74,4 @@ jobs:
 
           cargo run -p agent_cli -- verify-trace --trace out/trace.json
 
+
