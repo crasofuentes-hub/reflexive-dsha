@@ -14,3 +14,7 @@ Thumbs.db
 # Outputs
 /out/
 /artifacts/
+
+# Local editor backups
+*.bak
+
