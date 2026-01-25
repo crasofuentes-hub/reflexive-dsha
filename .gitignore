@@ -1,0 +1,16 @@
+﻿# Rust
+/target/
+/**/target/
+Cargo.lock.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Outputs
+/out/
+/artifacts/
