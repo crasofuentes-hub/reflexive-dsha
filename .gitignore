@@ -18,3 +18,7 @@ Thumbs.db
 # Local editor backups
 *.bak
 
+
+# Lean / Lake artifacts
+proofs/lean/.lake/
+proofs/lean/lake-manifest.json
