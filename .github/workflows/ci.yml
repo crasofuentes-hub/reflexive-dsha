@@ -1,4 +1,35 @@
-﻿      - name: Deterministic demo (trace hash stable between runs)
+﻿name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-windows:
+    name: windows-latest / rust build + tests + determinism
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable + components)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Tests
+        run: cargo test
+
+      - name: Deterministic demo (trace hash stable between runs)
         shell: pwsh
         run: |
           Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
@@ -15,3 +46,19 @@
           }
 
           cargo run -p agent_cli -- verify-trace --trace out/trace.json
+
+  lean-proofs:
+    name: ubuntu-latest / lean proofs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: proofs/lean
+
+      - name: Build proofs
+        run: |
+          cd proofs/lean
+          lake build
