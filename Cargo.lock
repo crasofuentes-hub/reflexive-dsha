@@ -27,6 +27,8 @@ name = "agent_ffi"
 version = "0.1.0"
 dependencies = [
  "agent_core",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

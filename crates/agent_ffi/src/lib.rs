@@ -1,4 +1,4 @@
-﻿#![deny(warnings)]
+#![deny(warnings)]
 #![deny(clippy::all)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::missing_errors_doc)]
@@ -13,7 +13,7 @@ use agent_core::{heal_to_fixpoint, HealConfig};
 /// - Caller owns input buffer.
 /// - We allocate output string with CString; caller must free via dsha_free().
 #[no_mangle]
-pub extern \"C\" fn dsha_heal_config_to_json(input_utf8: *const c_char) -> *mut c_char {
+pub extern "C" fn dsha_heal_config_to_json(input_utf8: *const c_char) -> *mut c_char {
     if input_utf8.is_null() {
         return std::ptr::null_mut();
     }
@@ -29,8 +29,8 @@ pub extern \"C\" fn dsha_heal_config_to_json(input_utf8: *const c_char) -> *mut 
     };
 
     let obj = serde_json::json!({
-        \"final\": final_state,
-        \"trace\": trace
+        "final": final_state,
+        "trace": trace
     });
 
     let s = match serde_json::to_string_pretty(&obj) {
@@ -46,7 +46,11 @@ pub extern \"C\" fn dsha_heal_config_to_json(input_utf8: *const c_char) -> *mut 
 }
 
 #[no_mangle]
-pub extern \"C\" fn dsha_free(ptr: *mut c_char) {
-    if ptr.is_null() { return; }
-    unsafe { let _ = CString::from_raw(ptr); }
+pub extern "C" fn dsha_free(ptr: *mut c_char) {
+    if ptr.is_null() {
+        return;
+    }
+    unsafe {
+        let _ = CString::from_raw(ptr);
+    }
 }

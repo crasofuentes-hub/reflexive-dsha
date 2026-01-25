@@ -1,9 +1,10 @@
-﻿use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Op {
     RemoveDuplicateKeys,
     NormalizeTokens,
+    RemoveInvalidTokens,
     InsertDefault { key: String, value: String },
     ClampRange { key: String, min: i64, max: i64 },
     SortKeysCanonical,

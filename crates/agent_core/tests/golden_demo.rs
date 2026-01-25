@@ -1,4 +1,4 @@
-﻿use agent_core::engine::{heal_to_fixpoint, verify_trace, HealConfig};
+use agent_core::engine::{heal_to_fixpoint, verify_trace, HealConfig};
 
 #[test]
 fn demo_is_bit_stable() {
@@ -8,7 +8,9 @@ timeout=999
 mode=unsafe
 timeout=10
 bad key=abc
-"#.trim().to_string();
+"#
+    .trim()
+    .to_string();
 
     let (st, trace) = heal_to_fixpoint(input, HealConfig { max_cycles: 16 }).expect("heal");
     verify_trace(&trace).expect("trace verify");
