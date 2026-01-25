@@ -15,6 +15,13 @@ bad key=abc
     let (st, trace) = heal_to_fixpoint(input, HealConfig { max_cycles: 16 }).expect("heal");
     verify_trace(&trace).expect("trace verify");
 
+    let expected = std::fs::read_to_string(&format!(
+        "{}/../../demo/expected/final.config",
+        env!("CARGO_MANIFEST_DIR")
+    ))
+    .expect("read demo/expected/final.config");
+    let expected = expected.trim_start_matches('\u{feff}').trim().to_string();
+
     let final_cfg = st.raw_input.trim().to_string();
-    assert_eq!(final_cfg, "mode=safe\ntimeout=600");
+    assert_eq!(final_cfg, expected);
 }
