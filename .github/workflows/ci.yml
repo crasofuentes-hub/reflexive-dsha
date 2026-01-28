@@ -57,17 +57,33 @@ jobs:
       - name: Install elan (Lean toolchain manager)
         shell: pwsh
         run: |
+          # Instala elan (no dependas de PATH ni de profile)
           iwr https://raw.githubusercontent.com/leanprover/elan/master/elan-init.ps1 -UseBasicParsing | iex
-          # Asegura PATH en esta sesión del runner
-          $env:PATH = "$HOME\.elan\bin;$env:PATH"
-          elan --version
-          lake --version
-          lean --version
+
+          $elanBin = Join-Path $HOME ".elan\bin"
+          $elan    = Join-Path $elanBin "elan.exe"
+          $lake    = Join-Path $elanBin "lake.exe"
+          $lean    = Join-Path $elanBin "lean.exe"
+
+          if (!(Test-Path $elan)) { throw "elan.exe not found at $elan" }
+          if (!(Test-Path $lake)) { throw "lake.exe not found at $lake" }
+          if (!(Test-Path $lean)) { throw "lean.exe not found at $lean" }
+
+          & $elan --version
+          & $lake --version
+          & $lean --version
 
       - name: Build formal proofs
         shell: pwsh
         run: |
           Set-Location .\formal
           if (Test-Path .\.lake) { Remove-Item -Recurse -Force .\.lake }
-          lake update
-          lake build
+
+          $elanBin = Join-Path $HOME ".elan\bin"
+          $lake    = Join-Path $elanBin "lake.exe"
+          $lean    = Join-Path $elanBin "lean.exe"
+
+          # Opcional: imprime toolchain real usado
+          & $lean --version
+          & $lake update
+          & $lake build
