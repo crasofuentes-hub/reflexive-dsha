@@ -26,3 +26,7 @@ proofs/lean/lake-manifest.json
 # local logs
 _logs/
 
+
+# local scripts
+diagnose.ps1
+
