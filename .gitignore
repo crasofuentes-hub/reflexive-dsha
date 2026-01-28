@@ -22,3 +22,7 @@ Thumbs.db
 # Lean / Lake artifacts
 proofs/lean/.lake/
 proofs/lean/lake-manifest.json
+
+# local logs
+_logs/
+
