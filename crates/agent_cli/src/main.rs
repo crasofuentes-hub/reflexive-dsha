@@ -31,7 +31,7 @@ fn main() {
 
             let raw = read_text_file(&in_path).unwrap_or_else(|e| panic!("{e}"));
             let (final_state, trace) =
-                heal_to_fixpoint(raw, HealConfig::default()).unwrap_or_else(|e| panic!("{e}"));
+                heal_to_fixpoint(raw, &HealConfig::default()).unwrap_or_else(|e| panic!("{e}"));
 
             let tf = TraceFile {
                 trace: trace.clone(),

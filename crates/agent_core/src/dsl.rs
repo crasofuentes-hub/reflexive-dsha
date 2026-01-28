@@ -16,6 +16,7 @@ pub struct PatchProgram {
 }
 
 impl PatchProgram {
+    #[must_use]
     pub fn new(ops: Vec<Op>) -> Self {
         Self { ops }
     }
