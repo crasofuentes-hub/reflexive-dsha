@@ -30,3 +30,7 @@ _logs/
 # local scripts
 diagnose.ps1
 
+# --- Lean/Lake (formal) ---
+formal/.lake
+formal/.lake/
+formal/lake-manifest.json
