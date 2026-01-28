@@ -1,11 +1,52 @@
-﻿name: CI
+name: CI
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
+  build-test-windows:
+    name: windows-latest / rust build + tests + determinism
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable + components)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Tests
+        run: cargo test
+
+      - name: Deterministic demo (trace hash stable between runs)
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
+          cargo run -p agent_cli -- run-demo --in demo/inputs/config.txt --out out
+          $h1 = (Get-FileHash "out/trace.json" -Algorithm SHA256).Hash
+
+          Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
+          cargo run -p agent_cli -- run-demo --in demo/inputs/config.txt --out out
+          $h2 = (Get-FileHash "out/trace.json" -Algorithm SHA256).Hash
+
+          if ($h1 -ne $h2) {
+            Write-Error "Non-deterministic output detected: $h1 vs $h2"
+            exit 1
+          }
+
+          cargo run -p agent_cli -- verify-trace --trace out/trace.json
+
   formal_lean:
     name: formal/ (Lean + Lake)
     runs-on: windows-latest
@@ -17,7 +58,11 @@ jobs:
         shell: pwsh
         run: |
           iwr https://raw.githubusercontent.com/leanprover/elan/master/elan-init.ps1 -UseBasicParsing | iex
+          # Asegura PATH en esta sesión del runner
+          $env:PATH = "$HOME\.elan\bin;$env:PATH"
           elan --version
+          lake --version
+          lean --version
 
       - name: Build formal proofs
         shell: pwsh
