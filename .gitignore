@@ -34,3 +34,6 @@ diagnose.ps1
 formal/.lake
 formal/.lake/
 formal/lake-manifest.json
+
+# Local backups
+*.bak_*
