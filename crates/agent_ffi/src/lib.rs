@@ -13,17 +13,17 @@ use agent_core::{heal_to_fixpoint, HealConfig};
 /// - Caller owns input buffer.
 /// - We allocate output string with CString; caller must free via dsha_free().
 #[no_mangle]
-pub extern "C" fn dsha_heal_config_to_json(input_utf8: *const c_char) -> *mut c_char {
+pub unsafe extern "C" fn dsha_heal_config_to_json(input_utf8: *const c_char) -> *mut c_char {
     if input_utf8.is_null() {
         return std::ptr::null_mut();
     }
-    let cstr = unsafe { CStr::from_ptr(input_utf8) };
+    let cstr = CStr::from_ptr(input_utf8);
     let input = match cstr.to_str() {
         Ok(s) => s.to_string(),
         Err(_) => return std::ptr::null_mut(),
     };
 
-    let (final_state, trace) = match heal_to_fixpoint(input, HealConfig::default()) {
+    let (final_state, trace) = match heal_to_fixpoint(input, &HealConfig::default()) {
         Ok(v) => v,
         Err(_) => return std::ptr::null_mut(),
     };
@@ -46,11 +46,14 @@ pub extern "C" fn dsha_heal_config_to_json(input_utf8: *const c_char) -> *mut c_
 }
 
 #[no_mangle]
-pub extern "C" fn dsha_free(ptr: *mut c_char) {
+pub unsafe extern "C" fn dsha_free(ptr: *mut c_char) {
     if ptr.is_null() {
         return;
     }
     unsafe {
+        if ptr.is_null() {
+            return;
+        }
         let _ = CString::from_raw(ptr);
     }
 }

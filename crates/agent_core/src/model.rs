@@ -1,4 +1,4 @@
-﻿use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -39,6 +39,7 @@ pub struct State {
 }
 
 impl State {
+    #[must_use]
     pub fn new(raw_input: String) -> Self {
         Self {
             raw_input,

@@ -362,81 +362,10 @@ fn exec_patch(mut state: State, patch: &PatchProgram) -> State {
 // ---------------------------
 // Healing loop + verification
 // ---------------------------
-
-pub fn heal_to_fixpoint(
-    initial_raw: String,
-    cfg: HealConfig,
-) -> Result<(State, Vec<TraceEvent>), String> {
-    let mut state = State::new(initial_raw);
-    state.entries = parse_raw(&state.raw_input);
-    state.canonical = build_canonical(&state.entries);
-
-    let mut trace: Vec<TraceEvent> = Vec::new();
-
-    for cycle in 0..cfg.max_cycles {
-        state.step = cycle;
-
-        let issues = detect_issues(&state);
-        let current_mu = mu(&issues);
-
-        if issues.is_empty() {
-            trace.push(TraceEvent {
-                step: state.step,
-                mu: 0,
-                issues,
-                patch: PatchProgram::new(vec![]),
-                state_hash_sha256: state_hash_sha256(&state),
-            });
-            return Ok((state, trace));
-        }
-
-        let patch = synthesize_patch(&issues, &state);
-        let mut next = exec_patch(state.clone(), &patch);
-        next.step = cycle + 1;
-
-        let next_issues = detect_issues(&next);
-        let next_mu = mu(&next_issues);
-
-        // Strict progress (termination measure)
-        if next_mu >= current_mu {
-            return Err(format!(
-                "Verification failed: mu did not decrease (current={current_mu}, next={next_mu})"
-            ));
-        }
-
-        // Extra guard: HIGH/MEDIUM must not increase
-        let cur_hm = issues
-            .iter()
-            .filter(|i| matches!(i.severity, Severity::HIGH | Severity::MEDIUM))
-            .count();
-        let nxt_hm = next_issues
-            .iter()
-            .filter(|i| matches!(i.severity, Severity::HIGH | Severity::MEDIUM))
-            .count();
-        if nxt_hm > cur_hm {
-            return Err("Verification failed: HIGH/MEDIUM issues increased".to_string());
-        }
-
-        trace.push(TraceEvent {
-            step: state.step,
-            mu: current_mu,
-            issues,
-            patch: patch.clone(),
-            state_hash_sha256: state_hash_sha256(&state),
-        });
-
-        state = next;
-
-        // Optional normalization pass once correctness is reached (only LOW may remain)
-        if is_correct(&state) {
-            let norm = PatchProgram::new(vec![Op::SortKeysCanonical]);
-            state = exec_patch(state.clone(), &norm);
-        }
-    }
-
-    Err("Max cycles reached without fixpoint".to_string())
-}
-
+/// Verifies that a trace is well-formed and that the monotone measure mu decreases as required.
+///
+/// # Errors
+/// Returns an error if the trace is malformed, if expected invariants are violated, or if any step fails validation.
 pub fn verify_trace(trace: &[TraceEvent]) -> Result<(), String> {
     // Strict trace checks:
     // - hash length
@@ -461,4 +390,71 @@ pub fn verify_trace(trace: &[TraceEvent]) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+/// Applies the deterministic healing pipeline until a fixpoint is reached or policy limits stop execution.
+///
+/// # Errors
+/// Returns an error if the input cannot be parsed, if policy limits are violated, if a fixpoint cannot be reached
+/// within the configured bounds, or if internal verification invariants fail (e.g., `mu` does not strictly decrease).
+pub fn heal_to_fixpoint(
+    initial_raw: String,
+    cfg: &HealConfig,
+) -> Result<(State, Vec<TraceEvent>), String> {
+    // Initialize state from raw input (deterministic parsing + canonicalization)
+    let mut state = State::new(initial_raw);
+    state.entries = parse_raw(&state.raw_input);
+    state.canonical = build_canonical(&state.entries);
+
+    let mut trace: Vec<TraceEvent> = Vec::new();
+
+    for _cycle in 0..cfg.max_cycles {
+        let issues = detect_issues(&state);
+        let m0 = mu(&issues);
+
+        let patch = synthesize_patch(&issues, &state);
+        let hash = state_hash_sha256(&state);
+
+        trace.push(TraceEvent {
+            step: state.step,
+            mu: m0,
+            issues: issues.clone(),
+            patch: patch.clone(),
+            state_hash_sha256: hash,
+        });
+
+        // Reached correctness / fixpoint
+        if m0 == 0 || is_correct(&state) {
+            break;
+        }
+
+        // Apply patch
+        let mut next = exec_patch(state, &patch);
+        next.step = next.step.saturating_add(1);
+
+        // Enforce strict progress (required by verify_trace invariants)
+        let m1 = mu(&detect_issues(&next));
+        if m1 >= m0 {
+            return Err(format!(
+                "Healing did not make progress: mu {m0} -> {m1} (max_cycles={}, step={})",
+                cfg.max_cycles, next.step
+            ));
+        }
+
+        state = next;
+    }
+
+    // Verify trace monotonicity invariants
+    verify_trace(&trace)?;
+
+    // Final correctness check
+    let final_mu = mu(&detect_issues(&state));
+    if final_mu != 0 {
+        return Err(format!(
+            "Fixpoint not reached within max_cycles={} (final mu={final_mu})",
+            cfg.max_cycles
+        ));
+    }
+
+    Ok((state, trace))
 }
