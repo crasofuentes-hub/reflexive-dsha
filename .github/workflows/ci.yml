@@ -54,6 +54,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache elan toolchains
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Users\runneradmin\.elan
+          key: ${{ runner.os }}-elan-${{ hashFiles('formal/lean-toolchain') }}
+          restore-keys: |
+            ${{ runner.os }}-elan-
       - name: Install elan (Lean toolchain manager)
         shell: pwsh
         run: |
@@ -73,11 +81,20 @@ jobs:
           & $lake --version
           & $lean --version
 
+
+      - name: Cache Lake build
+        uses: actions/cache@v4
+        with:
+          path: |
+            formal\.lake
+            formal\.lake\packages
+          key: ${{ runner.os }}-lake-${{ hashFiles('formal/lakefile.lean', 'formal/lean-toolchain', 'formal/ReflexiveDSHA/**.lean', 'formal/ReflexiveDSHA.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-lake-
       - name: Build formal proofs
         shell: pwsh
         run: |
           Set-Location .\formal
-          if (Test-Path .\.lake) { Remove-Item -Recurse -Force .\.lake }
 
           $elanBin = Join-Path $HOME ".elan\bin"
           $lake    = Join-Path $elanBin "lake.exe"
