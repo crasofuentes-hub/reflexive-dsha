@@ -1,50 +1,30 @@
+import Std
 import ReflexiveDSHA.Basic
 
 namespace ReflexiveDSHA
 
-section
-  variable {State : Type} {Issue : Type}
-  variable (detect_issues : State -> List Issue)
-  variable (mu : List Issue -> Nat)
-  variable (heal : State -> State)
-  variable (decreases :
-    ∀ s : State,
-      ¬ is_fixpoint detect_issues mu s →
-        mu (detect_issues (heal s)) < mu (detect_issues s))
+/-
+  Proofs layer (Lean 4.27, autoImplicit=false)
 
-  /- ------------------------------------------------------------------
-     Placeholders (axioms) — reemplázalos por pruebas reales después.
-     Mantienen CI verde y preservan el “contrato” formal de tu proyecto.
-     ------------------------------------------------------------------ -/
+  Verified state:
+  - ReflexiveDSHA.Basic exports only:
+      * is_fixpoint
+      * is_fixpoint_decidable
+  - It does NOT define or export:
+      * heal_to_fixpoint, heal_to_fixpoint_with_trace, run_with_trace, hash_trace
 
-  axiom heal_to_fixpoint_is_fixpoint (s : State) :
-    is_fixpoint detect_issues mu (heal_to_fixpoint detect_issues mu heal decreases s)
+  Therefore, this Proofs layer must not reference those names.
+-/
 
-  axiom heal_to_fixpoint_idempotent (s : State) :
-    heal_to_fixpoint detect_issues mu heal decreases
-      (heal_to_fixpoint detect_issues mu heal decreases s)
-    =
-    heal_to_fixpoint detect_issues mu heal decreases s
+-- Si quieres, aquí van teoremas SOBRE lo que sí existe:
 
-  axiom run_with_trace_nonempty (s : State) :
-    (run_with_trace detect_issues mu heal decreases s).snd ≠ []
-
-  axiom trace_last_equals_final (s : State) :
-    (run_with_trace detect_issues mu heal decreases s).snd.getLast? =
-      some (run_with_trace detect_issues mu heal decreases s).fst
-
-  /- Hash soundness: hash(trace) = hash(final_state). -/
-  theorem trace_hash_soundness (hash_state : State -> Nat) (s : State) :
-    hash_trace (State := State) hash_state
-      (run_with_trace detect_issues mu heal decreases s).snd
-    =
-    hash_state (run_with_trace detect_issues mu heal decreases s).fst := by
-    unfold hash_trace
-    have hl :=
-      trace_last_equals_final
-        (detect_issues := detect_issues) (mu := mu) (heal := heal) (decreases := decreases) (s := s)
-    simp [hl]
-
-end
+theorem is_fixpoint_iff_measure_zero
+  {State : Type} {Issue : Type}
+  (detect_issues : State -> List Issue)
+  (mu : List Issue -> Nat)
+  (s : State) :
+  is_fixpoint (State := State) (Issue := Issue) (detect_issues := detect_issues) (mu := mu) s
+    ↔ mu (detect_issues s) = 0 := by
+  rfl
 
 end ReflexiveDSHA
