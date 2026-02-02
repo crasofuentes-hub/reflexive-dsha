@@ -1,7 +1,6 @@
 use crate::dsl::{Op, PatchProgram};
 use crate::model::{Issue, Severity, State};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone)]
@@ -103,18 +102,6 @@ fn print_canonical(map: &BTreeMap<String, String>) -> String {
     out
 }
 
-fn state_hash_sha256(state: &State) -> String {
-    // Canonical bytes: stable JSON of (step + canonical)
-    // BTreeMap ensures key order; serde_json stable for this structure.
-    let obj = serde_json::json!({
-        "step": state.step,
-        "canonical": state.canonical
-    });
-    let bytes = serde_json::to_vec(&obj).expect("json encode");
-    let mut h = Sha256::new();
-    h.update(&bytes);
-    hex::encode(h.finalize())
-}
 
 // ---------------------------
 // Detection (P(S) / issues)
@@ -413,7 +400,7 @@ pub fn heal_to_fixpoint(
         let m0 = mu(&issues);
 
         let patch = synthesize_patch(&issues, &state);
-        let hash = state_hash_sha256(&state);
+        let hash = crate::hashing::state_hash_sha256_from_parts(state.step, &state.canonical);
 
         trace.push(TraceEvent {
             step: state.step,
@@ -445,8 +432,27 @@ pub fn heal_to_fixpoint(
     }
 
     // Verify trace monotonicity invariants
-    verify_trace(&trace)?;
+    // Ensure the trace contains a terminal event for the final state.
+    let final_issues = detect_issues(&state);
+    let final_mu = mu(&final_issues);
+    let final_hash = crate::hashing::state_hash_sha256_from_parts(state.step, &state.canonical);
 
+    // Avoid duplicating identical terminal event
+    let need_terminal = trace
+        .last()
+        .map(|e| e.state_hash_sha256 != final_hash || e.mu != final_mu || e.step != state.step)
+        .unwrap_or(true);
+
+    if need_terminal {
+        trace.push(TraceEvent {
+            step: state.step,
+            mu: final_mu,
+            issues: final_issues,
+            patch: PatchProgram::new(Vec::new()), // empty patch for terminal snapshot
+            state_hash_sha256: final_hash,
+        });
+    }
+    verify_trace(&trace)?;
     // Final correctness check
     let final_mu = mu(&detect_issues(&state));
     if final_mu != 0 {

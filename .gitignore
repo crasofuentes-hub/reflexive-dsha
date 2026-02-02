@@ -37,3 +37,13 @@ formal/lake-manifest.json
 
 # Local backups
 *.bak_*
+
+# --- local artifacts ---
+_backups/
+formal/_build_log.txt
+formal/_*.txt
+target/
+
+# Build / logs
+formal/*.log
+formal/_build_log.txt
