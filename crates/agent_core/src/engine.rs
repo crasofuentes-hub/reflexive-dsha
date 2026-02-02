@@ -1,7 +1,6 @@
 use crate::dsl::{Op, PatchProgram};
 use crate::model::{Issue, Severity, State};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone)]
@@ -103,18 +102,6 @@ fn print_canonical(map: &BTreeMap<String, String>) -> String {
     out
 }
 
-fn state_hash_sha256(state: &State) -> String {
-    // Canonical bytes: stable JSON of (step + canonical)
-    // BTreeMap ensures key order; serde_json stable for this structure.
-    let obj = serde_json::json!({
-        "step": state.step,
-        "canonical": state.canonical
-    });
-    let bytes = serde_json::to_vec(&obj).expect("json encode");
-    let mut h = Sha256::new();
-    h.update(&bytes);
-    hex::encode(h.finalize())
-}
 
 // ---------------------------
 // Detection (P(S) / issues)
@@ -413,7 +400,7 @@ pub fn heal_to_fixpoint(
         let m0 = mu(&issues);
 
         let patch = synthesize_patch(&issues, &state);
-        let hash = state_hash_sha256(&state);
+        let hash = crate::hashing::state_hash_sha256_from_parts(state.step, &state.canonical);
 
         trace.push(TraceEvent {
             step: state.step,
