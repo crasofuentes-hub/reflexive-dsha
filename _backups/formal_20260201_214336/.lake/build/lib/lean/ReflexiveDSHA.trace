@@ -1,0 +1,32 @@
+{"synthetic": false,
+ "schemaVersion": "2025-09-10",
+ "outputs":
+ {"o": ["69139636224ebfe4.olean"],
+  "i": "1c8682b811995d37.ilean",
+  "c": "c2767981fd49c613.c"},
+ "log":
+ [{"message":
+   ".> LEAN_PATH=C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\lib\\lean c:\\Users\\servi\\.elan\\toolchains\\leanprover--lean4---v4.27.0\\bin\\lean.exe -DautoImplicit=false C:\\repos\\reflexive-dsha\\formal\\ReflexiveDSHA.lean -o C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\lib\\lean\\ReflexiveDSHA.olean -i C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\lib\\lean\\ReflexiveDSHA.ilean -c C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\ir\\ReflexiveDSHA.c --setup C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\ir\\ReflexiveDSHA.setup.json --json",
+   "level": "trace"}],
+ "inputs":
+ [["ReflexiveDSHA:deps",
+   [["deps",
+     [["reflexive_dsha/ReflexiveDSHA:extraDep",
+       [["@reflexive_dsha:extraDep", "00000000000006bb"]]],
+      ["imports",
+       [["ReflexiveDSHA.Basic transitive imports (legacy)", "00000000000006bb"],
+        ["ReflexiveDSHA.Basic:importAllArts", "85bee78d4c767f8b"],
+        ["ReflexiveDSHA.Proofs transitive imports (legacy)",
+         "edc1cb53cb82e949"],
+        ["ReflexiveDSHA.Proofs:importAllArts", "a97f7318cf70bf25"]]]]],
+    ["libs",
+     [["import dynlibs", "00000000000006bb"],
+      ["package external libraries", "00000000000006bb"],
+      ["module dynlibs", "00000000000006bb"],
+      ["module plugins", "00000000000006bb"]]]]],
+  ["Lean 4.27.0, commit db93fe1608548721853390a10cd40580fe7d22ae",
+   "9a2be90fd35343e5"],
+  ["C:\\repos\\reflexive-dsha\\formal\\ReflexiveDSHA.lean", "98a441f9aca6958f"],
+  ["options", "00000000000006bb"],
+  ["Module.leanArgs: #[-DautoImplicit=false]", "83bf8aa7a6e9844b"]],
+ "depHash": "63ca21d814c778cc"}

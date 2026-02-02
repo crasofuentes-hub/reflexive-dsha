@@ -1,0 +1,9 @@
+{"plugins": [],
+ "package": "reflexive_dsha",
+ "options": {},
+ "name": "ReflexiveDSHA.Proofs",
+ "isModule": false,
+ "importArts":
+ {"ReflexiveDSHA.Basic":
+  ["C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\lib\\lean\\ReflexiveDSHA\\Basic.olean"]},
+ "dynlibs": []}

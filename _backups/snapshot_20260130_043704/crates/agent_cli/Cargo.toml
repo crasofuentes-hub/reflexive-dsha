@@ -1,0 +1,9 @@
+﻿[package]
+name = "agent_cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+agent_core = { path = "../agent_core" }
+serde_json = "1"

@@ -1,0 +1,107 @@
+{
+  "trace": [
+    {
+      "step": 0,
+      "mu": 701,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "kind": "InvalidToken",
+          "message": "Invalid key token: '﻿{'"
+        },
+        {
+          "severity": "HIGH",
+          "kind": "InvalidToken",
+          "message": "Invalid key token: '\"demo\": true,'"
+        },
+        {
+          "severity": "HIGH",
+          "kind": "InvalidToken",
+          "message": "Invalid key token: '\"scenario\": \"basic\",'"
+        },
+        {
+          "severity": "HIGH",
+          "kind": "InvalidToken",
+          "message": "Invalid key token: '\"notes\": \"Este archivo es un input de ejemplo para run-demo. Ajusta el esquema exacto si agent_cli requiere campos específicos.\"'"
+        },
+        {
+          "severity": "HIGH",
+          "kind": "InvalidToken",
+          "message": "Invalid key token: '}'"
+        },
+        {
+          "severity": "HIGH",
+          "kind": "MissingRequired",
+          "message": "Missing required key: timeout"
+        },
+        {
+          "severity": "HIGH",
+          "kind": "MissingRequired",
+          "message": "Missing required key: mode"
+        },
+        {
+          "severity": "LOW",
+          "kind": "NonCanonicalOrder",
+          "message": "Input not in canonical order/format"
+        }
+      ],
+      "patch": {
+        "ops": [
+          "NormalizeTokens",
+          "RemoveInvalidTokens",
+          {
+            "InsertDefault": {
+              "key": "timeout",
+              "value": "30"
+            }
+          },
+          {
+            "InsertDefault": {
+              "key": "mode",
+              "value": "safe"
+            }
+          },
+          "SortKeysCanonical"
+        ]
+      },
+      "state_hash_sha256": "19fb0a4972860c3174d8577b87c63578d1a35f6eee77c8479ec026decb5986da"
+    },
+    {
+      "step": 1,
+      "mu": 0,
+      "issues": [],
+      "patch": {
+        "ops": [
+          "NormalizeTokens",
+          {
+            "ClampRange": {
+              "key": "timeout",
+              "min": 0,
+              "max": 600
+            }
+          },
+          "SortKeysCanonical"
+        ]
+      },
+      "state_hash_sha256": "b0cb7af9750ba8332913eea391a1633e784bb2cb201997266f483eb328ca8b97"
+    }
+  ],
+  "final_state": {
+    "raw_input": "mode=safe\ntimeout=30\n",
+    "entries": [
+      [
+        "mode",
+        "safe"
+      ],
+      [
+        "timeout",
+        "30"
+      ]
+    ],
+    "canonical": {
+      "mode": "safe",
+      "timeout": "30"
+    },
+    "step": 1
+  }
+}

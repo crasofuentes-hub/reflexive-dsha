@@ -1,0 +1,18 @@
+{
+  "raw_input": "mode=safe\ntimeout=30\n",
+  "entries": [
+    [
+      "mode",
+      "safe"
+    ],
+    [
+      "timeout",
+      "30"
+    ]
+  ],
+  "canonical": {
+    "mode": "safe",
+    "timeout": "30"
+  },
+  "step": 1
+}

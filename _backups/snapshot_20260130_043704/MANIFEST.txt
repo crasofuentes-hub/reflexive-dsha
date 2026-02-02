@@ -1,0 +1,6 @@
+Backup snapshot: 20260130_043704
+Repo: C:\repos\reflexive-dsha
+Branch: safety/snapshot-lean
+HEAD: 8ee4ee9
+ZIP: C:\repos\reflexive-dsha\_backups\reflexive-dsha_snapshot_20260130_043704.zip
+

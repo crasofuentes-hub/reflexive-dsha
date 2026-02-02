@@ -1,0 +1,28 @@
+{"synthetic": false,
+ "schemaVersion": "2025-09-10",
+ "outputs":
+ {"o": ["fff34d06ab2dcc67.olean"],
+  "i": "efead11be8e71b8b.ilean",
+  "c": "cc1a41b7f97fcde9.c"},
+ "log":
+ [{"message":
+   ".> LEAN_PATH=C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\lib\\lean c:\\Users\\servi\\.elan\\toolchains\\leanprover--lean4---v4.27.0\\bin\\lean.exe -DautoImplicit=false C:\\repos\\reflexive-dsha\\formal\\ReflexiveDSHA\\Basic.lean -o C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\lib\\lean\\ReflexiveDSHA\\Basic.olean -i C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\lib\\lean\\ReflexiveDSHA\\Basic.ilean -c C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\ir\\ReflexiveDSHA\\Basic.c --setup C:\\repos\\reflexive-dsha\\formal\\.lake\\build\\ir\\ReflexiveDSHA\\Basic.setup.json --json",
+   "level": "trace"}],
+ "inputs":
+ [["ReflexiveDSHA.Basic:deps",
+   [["deps",
+     [["reflexive_dsha/ReflexiveDSHA:extraDep",
+       [["@reflexive_dsha:extraDep", "00000000000006bb"]]],
+      ["imports", "00000000000006bb"]]],
+    ["libs",
+     [["import dynlibs", "00000000000006bb"],
+      ["package external libraries", "00000000000006bb"],
+      ["module dynlibs", "00000000000006bb"],
+      ["module plugins", "00000000000006bb"]]]]],
+  ["Lean 4.27.0, commit db93fe1608548721853390a10cd40580fe7d22ae",
+   "9a2be90fd35343e5"],
+  ["C:\\repos\\reflexive-dsha\\formal\\ReflexiveDSHA\\Basic.lean",
+   "4e44ca482a66bebd"],
+  ["options", "00000000000006bb"],
+  ["Module.leanArgs: #[-DautoImplicit=false]", "83bf8aa7a6e9844b"]],
+ "depHash": "a10a8774c8bb93c6"}
