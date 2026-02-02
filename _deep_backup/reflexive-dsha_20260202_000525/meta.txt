@@ -1,0 +1,9 @@
+﻿timestamp=20260202_000525
+head=164d997a8076ccc5115c93381fec38e4a717109e
+branch=main
+status=
+?? _deep_backup/
+
+tags:
+v0.1.9
+v0.2.0
