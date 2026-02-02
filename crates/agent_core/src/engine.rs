@@ -234,12 +234,6 @@ fn mu(issues: &[Issue]) -> u64 {
         .sum()
 }
 
-fn is_correct(state: &State) -> bool {
-    let issues = detect_issues(state);
-    !issues
-        .iter()
-        .any(|i| matches!(i.severity, Severity::HIGH | Severity::MEDIUM))
-}
 
 // ---------------------------
 // Patch synthesis + execution
@@ -424,9 +418,7 @@ pub fn heal_to_fixpoint(
         });
 
         // Reached correctness / fixpoint
-        if m0 == 0 || is_correct(&state) {
-            break;
-        }
+        if m0 == 0 { break; }
 
         // Apply patch
         let mut next = exec_patch(state, &patch);

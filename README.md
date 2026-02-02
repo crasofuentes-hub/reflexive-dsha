@@ -1,4 +1,4 @@
-﻿# reflexive-dsha
+# reflexive-dsha
 
 Deterministic self-healing agent core (Rust-first), offline, reproducible, trace-hashed, with formal-verification scaffolding.
 
@@ -19,18 +19,22 @@ Get-Content out/final.config
 ## Next: Formal proofs
 - proofs/lean: DSL semantics + termination/soundness theorems
 - proofs/tla: composability + deadlock-freedom model
+
+
 ## Estado de las pruebas formales (Lean)
 
-Este proyecto persigue garantías fuertes: determinismo, trazas verificables y pruebas formales tempranas.
+Ubicacion: `formal/ReflexiveDSHA/*`
 
-### Teoremas demostrados
-- **Idempotencia en fixpoint**: si mu(detect_issues(s)) = 0, entonces heal_to_fixpoint(n, s) = (s, []) para todo 
-.
-  - Archivo: ormal/ReflexiveDSHA/Proofs.lean (heal_to_fixpoint_idempotent_if_fixpoint)
+**Demostrado / compilando:**
+- `is_fixpoint` definido como `mu (detect_issues s) = 0`.
+- Terminacion de `heal_to_fixpoint` y `heal_to_fixpoint_with_trace` basada en una medida bien fundada `mu` con hipotesis `decreases` (compila en Lean).
 
-- **Soundness (hash vs semántica)**: el hash reportado por el pipeline coincide con el hash de la traza generada por la semántica operacional modelada.
-  - Archivo: ormal/ReflexiveDSHA/Proofs.lean (hash_matches_semantics)
+**En progreso (prioridad):**
+- Idempotencia en fixpoint: si `is_fixpoint ... s`, entonces `heal_to_fixpoint ... s = s` (en el API Lean actual).
+- Soundness trace/hash: el hash derivado del ultimo estado del trace coincide con el hash del estado final, y es consistente con `verify-trace` (Rust).
 
-### En progreso
-- **Terminación por medida bien fundada**: bajo el invariante mu estrictamente decreciente en cada paso fuera de fixpoint, se alcanza un fixpoint en ≤ mu(s0) pasos (con fuel suficiente).
-  - Archivo: ormal/ReflexiveDSHA/Proofs.lean (eaches_fixpoint_within_mu)
+**Pendiente (futuro cercano):**
+- Vincular formalmente el modelo Lean con la implementacion Rust (modelo/axiomas vs extraccion).
+- Invariantes adicionales: estabilidad del hash, propiedades del trace, etc.
+
+> Nota: la capa Lean se mantiene minimalista y ASCII-only para maximizar portabilidad y estabilidad del build.
