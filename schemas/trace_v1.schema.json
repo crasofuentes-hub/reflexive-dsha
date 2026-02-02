@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reflexive-DSHA Trace v1",
+  "type": "object",
+  "required": ["trace_format_version", "trace"],
+  "properties": {
+    "trace_format_version": { "type": "string", "enum": ["1"] },
+    "trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step", "mu", "state_hash_sha256"],
+        "properties": {
+          "step": { "type": "integer", "minimum": 0 },
+          "mu": { "type": "integer", "minimum": 0 },
+          "state_hash_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}
