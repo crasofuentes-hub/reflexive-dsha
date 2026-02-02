@@ -432,8 +432,27 @@ pub fn heal_to_fixpoint(
     }
 
     // Verify trace monotonicity invariants
-    verify_trace(&trace)?;
+    // Ensure the trace contains a terminal event for the final state.
+    let final_issues = detect_issues(&state);
+    let final_mu = mu(&final_issues);
+    let final_hash = crate::hashing::state_hash_sha256_from_parts(state.step, &state.canonical);
 
+    // Avoid duplicating identical terminal event
+    let need_terminal = trace
+        .last()
+        .map(|e| e.state_hash_sha256 != final_hash || e.mu != final_mu || e.step != state.step)
+        .unwrap_or(true);
+
+    if need_terminal {
+        trace.push(TraceEvent {
+            step: state.step,
+            mu: final_mu,
+            issues: final_issues,
+            patch: PatchProgram::new(Vec::new()), // empty patch for terminal snapshot
+            state_hash_sha256: final_hash,
+        });
+    }
+    verify_trace(&trace)?;
     // Final correctness check
     let final_mu = mu(&detect_issues(&state));
     if final_mu != 0 {

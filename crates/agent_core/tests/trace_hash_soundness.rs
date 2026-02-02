@@ -2,7 +2,7 @@ use agent_core::{heal_to_fixpoint, HealConfig};
 
 #[test]
 fn trace_last_hash_matches_final_state_hash() {
-    // Forzamos healing: modo invalido + faltante de timeout
+    // Force healing: invalid mode + missing timeout; includes CRLF normalization.
     let raw = "mode=INVALID\r\na=1\r\n";
 
     let (final_state, trace) =
@@ -11,10 +11,12 @@ fn trace_last_hash_matches_final_state_hash() {
     assert!(!trace.is_empty(), "trace must not be empty");
 
     let last = trace.last().expect("trace last");
-    let trace_hash = last.state_hash_sha256.clone();
+
+    // Must be terminal fixpoint snapshot
+    assert_eq!(last.mu, 0, "terminal trace event must have mu=0");
 
     let recomputed =
         agent_core::hashing::state_hash_sha256_from_parts(final_state.step, &final_state.canonical);
 
-    assert_eq!(trace_hash, recomputed);
+    assert_eq!(last.state_hash_sha256, recomputed);
 }
