@@ -44,3 +44,6 @@ formal/_build_log.txt
 formal/_*.txt
 target/
 
+# Build / logs
+formal/*.log
+formal/*.txt
