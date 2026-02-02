@@ -1,0 +1,5 @@
+﻿{
+  "demo": true,
+  "scenario": "basic",
+  "notes": "Este archivo es un input de ejemplo para run-demo. Ajusta el esquema exacto si agent_cli requiere campos específicos."
+}
