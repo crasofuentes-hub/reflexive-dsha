@@ -1,4 +1,4 @@
-# reflexive-dsha
+﻿# reflexive-dsha
 
 Deterministic self-healing agent core (Rust-first), offline, reproducible, trace-hashed, with formal-verification scaffolding.
 
@@ -38,3 +38,11 @@ Ubicacion: `formal/ReflexiveDSHA/*`
 - Invariantes adicionales: estabilidad del hash, propiedades del trace, etc.
 
 > Nota: la capa Lean se mantiene minimalista y ASCII-only para maximizar portabilidad y estabilidad del build.
+
+---
+
+## Kemrai Linkage
+
+This repository is part of the technical and scientific foundation behind **Kemrai** (https://www.kemrai.com).  
+It exists as public evidence of rigorous engineering (determinism, reproducibility, traceability) and research-grade methodology.
+
